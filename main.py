@@ -10,19 +10,15 @@ import os
 import traceback
 from urllib.parse import urljoin
 from datetime import datetime, timedelta
-# New library added
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 # --- Configuration (Fill in your details) ---
-# Your Telegram Bot Token here. You can get it from BotFather.
-# Example: YOUR_BOT_TOKEN = "1234567890:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-YOUR_BOT_TOKEN = "8216244005:AAHd2xupqCn6Saz9Igpugu-kU4khkPC3WV4" # <--- This line needs to be changed
+YOUR_BOT_TOKEN = "8216244005:AAHd2xupqCn6Saz9Igpugu-kU4khkPC3WV4"
 
-# ==================== New Addition: Multiple Admin IDs ====================
-# Add your and other admins' Telegram User IDs to the list below
-ADMIN_CHAT_IDS = ["7500869913"] # Example: ["YOUR_ADMIN_USER_ID_1", "YOUR_ADMIN_USER_ID_2"]
-# =================================================================
+# ==================== Multiple Admin IDs ====================
+ADMIN_CHAT_IDS = ["7500869913"]
+# ==========================================================
 
 # Old chat IDs kept for the first run
 INITIAL_CHAT_IDS = ["-1003053441379"] 
@@ -34,17 +30,16 @@ SMS_API_ENDPOINT = "https://www.ivasms.com/portal/sms/received/getsms"
 USERNAME = "tawandamahachi07@gmail.com"
 PASSWORD = "mahachi2007"
 
-# Reduced interval to 2 seconds to keep the bot responsive and reduce server load
+# Polling interval in seconds
 POLLING_INTERVAL_SECONDS = 2 
-# STATE_FILE name changed
 STATE_FILE = "processed_sms_ids.json" 
-CHAT_IDS_FILE = "chat_ids.json" # New file for saving chat IDs
+CHAT_IDS_FILE = "chat_ids.json"
 
 INLINE_BUTTONS = [
     InlineKeyboardButton("📱 NUMBER CHANNEL", url="https://t.me/mrafrixtech"),
     InlineKeyboardButton("BACKUP CHANNEL", url="https://t.me/auroratechinc"),
     InlineKeyboardButton("OTP GROUP", url="https://t.me/afrixotpgc"),
-    InlineKeyboardButton("CONTACT DEV", url="@jaden_afrix"),
+    InlineKeyboardButton("CONTACT DEV", url="https://t.me/jaden_afrix"),
 ]
 
 # List of countries
@@ -53,7 +48,7 @@ COUNTRY_FLAGS = {
     "Argentina": "🇦🇷", "Armenia": "🇦🇲", "Australia": "🇦🇺", "Austria": "🇦🇹", "Azerbaijan": "🇦🇿",
     "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩", "Belarus": "🇧🇾", "Belgium": "🇧🇪", "Benin": "🇧🇯",
     "Bhutan": "🇧🇹", "Bolivia": "🇧🇴", "Brazil": "🇧🇷", "Bulgaria": "🇧🇬", "Burkina Faso": "🇧🇫",
-    "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦", "Chad": "🇹🇩", "Chile": "🇨 ",
+    "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦", "Chad": "🇹🇩", "Chile": "🇨🇱",
     "China": "🇨🇳", "Colombia": "🇨🇴", "Congo": "🇨🇬", "Croatia": "🇭🇷", "Cuba": "🇨🇺",
     "Cyprus": "🇨🇾", "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Egypt": "🇪🇬", "Estonia": "🇪🇪",
     "Ethiopia": "🇪🇹", "Finland": "🇫🇮", "France": "🇫🇷", "Gabon": "🇬🇦", "Gambia": "🇬🇲",
@@ -80,95 +75,33 @@ COUNTRY_FLAGS = {
     "Yemen": "🇾🇪", "Zambia": "🇿🇲", "Zimbabwe": "🇿🇼", "Unknown Country": "🏴‍☠️"
 }
 
-# Service Keywords (for identifying service from SMS text)
+# Service Keywords
 SERVICE_KEYWORDS = {
-    "Facebook": ["facebook"],
-    "Google": ["google", "gmail"],
-    "WhatsApp": ["whatsapp"],
-    "Telegram": ["telegram"],
-    "Instagram": ["instagram"],
-    "Amazon": ["amazon"],
-    "Netflix": ["netflix"],
-    "LinkedIn": ["linkedin"],
-    "Microsoft": ["microsoft", "outlook", "live.com"],
-    "Apple": ["apple", "icloud"],
-    "Twitter": ["twitter"],
-    "Snapchat": ["snapchat"],
-    "TikTok": ["tiktok"],
-    "Discord": ["discord"],
-    "Signal": ["signal"],
-    "Viber": ["viber"],
-    "IMO": ["imo"],
-    "PayPal": ["paypal"],
-    "Binance": ["binance"],
-    "Uber": ["uber"],
-    "Bolt": ["bolt"],
-    "Airbnb": ["airbnb"],
-    "Yahoo": ["yahoo"],
-    "Steam": ["steam"],
-    "Blizzard": ["blizzard"],
-    "Foodpanda": ["foodpanda"],
-    "Pathao": ["pathao"],
-    # Newly added service keywords
-    "Messenger": ["messenger", "meta"],
-    "Gmail": ["gmail", "google"],
-    "YouTube": ["youtube", "google"],
-    "X": ["x", "twitter"],
-    "eBay": ["ebay"],
-    "AliExpress": ["aliexpress"],
-    "Alibaba": ["alibaba"],
-    "Flipkart": ["flipkart"],
-    "Outlook": ["outlook", "microsoft"],
-    "Skype": ["skype", "microsoft"],
-    "Spotify": ["spotify"],
-    "iCloud": ["icloud", "apple"],
-    "Stripe": ["stripe"],
-    "Cash App": ["cash app", "square cash"],
-    "Venmo": ["venmo"],
-    "Zelle": ["zelle"],
-    "Wise": ["wise", "transferwise"],
-    "Coinbase": ["coinbase"],
-    "KuCoin": ["kucoin"],
-    "Bybit": ["bybit"],
-    "OKX": ["okx"],
-    "Huobi": ["huobi"],
-    "Kraken": ["kraken"],
-    "MetaMask": ["metamask"],
-    "Epic Games": ["epic games", "epicgames"],
-    "PlayStation": ["playstation", "psn"],
-    "Xbox": ["xbox", "microsoft"],
-    "Twitch": ["twitch"],
-    "Reddit": ["reddit"],
-    "ProtonMail": ["protonmail", "proton"],
-    "Zoho": ["zoho"],
-    "Quora": ["quora"],
-    "StackOverflow": ["stackoverflow"],
-    "LinkedIn": ["linkedin"],
-    "Indeed": ["indeed"],
-    "Upwork": ["upwork"],
-    "Fiverr": ["fiverr"],
-    "Glassdoor": ["glassdoor"],
-    "Airbnb": ["airbnb"],
-    "Booking.com": ["booking.com", "booking"],
-    "Careem": ["careem"],
-    "Swiggy": ["swiggy"],
-    "Zomato": ["zomato"],
-    "McDonald's": ["mcdonalds", "mcdonald's"],
-    "KFC": ["kfc"],
-    "Nike": ["nike"],
-    "Adidas": ["adidas"],
-    "Shein": ["shein"],
-    "OnlyFans": ["onlyfans"],
-    "Tinder": ["tinder"],
-    "Bumble": ["bumble"],
-    "Grindr": ["grindr"],
-    "Line": ["line"],
-    "WeChat": ["wechat"],
-    "VK": ["vk", "vkontakte"],
-    "Unknown": ["unknown"] # Fallback, likely won't have specific keywords
+    "Facebook": ["facebook"], "Google": ["google", "gmail"], "WhatsApp": ["whatsapp"], "Telegram": ["telegram"],
+    "Instagram": ["instagram"], "Amazon": ["amazon"], "Netflix": ["netflix"], "LinkedIn": ["linkedin"],
+    "Microsoft": ["microsoft", "outlook", "live.com"], "Apple": ["apple", "icloud"], "Twitter": ["twitter"],
+    "Snapchat": ["snapchat"], "TikTok": ["tiktok"], "Discord": ["discord"], "Signal": ["signal"],
+    "Viber": ["viber"], "IMO": ["imo"], "PayPal": ["paypal"], "Binance": ["binance"],
+    "Uber": ["uber"], "Bolt": ["bolt"], "Airbnb": ["airbnb"], "Yahoo": ["yahoo"],
+    "Steam": ["steam"], "Blizzard": ["blizzard"], "Foodpanda": ["foodpanda"], "Pathao": ["pathao"],
+    "Messenger": ["messenger", "meta"], "Gmail": ["gmail", "google"], "YouTube": ["youtube", "google"],
+    "X": ["x", "twitter"], "eBay": ["ebay"], "AliExpress": ["aliexpress"], "Alibaba": ["alibaba"],
+    "Flipkart": ["flipkart"], "Outlook": ["outlook", "microsoft"], "Skype": ["skype", "microsoft"],
+    "Spotify": ["spotify"], "iCloud": ["icloud", "apple"], "Stripe": ["stripe"], "Cash App": ["cash app", "square cash"],
+    "Venmo": ["venmo"], "Zelle": ["zelle"], "Wise": ["wise", "transferwise"], "Coinbase": ["coinbase"],
+    "KuCoin": ["kucoin"], "Bybit": ["bybit"], "OKX": ["okx"], "Huobi": ["huobi"],
+    "Kraken": ["kraken"], "MetaMask": ["metamask"], "Epic Games": ["epic games", "epicgames"],
+    "PlayStation": ["playstation", "psn"], "Xbox": ["xbox", "microsoft"], "Twitch": ["twitch"],
+    "Reddit": ["reddit"], "ProtonMail": ["protonmail", "proton"], "Zoho": ["zoho"], "Quora": ["quora"],
+    "StackOverflow": ["stackoverflow"], "Indeed": ["indeed"], "Upwork": ["upwork"], "Fiverr": ["fiverr"],
+    "Glassdoor": ["glassdoor"], "Booking.com": ["booking.com", "booking"], "Careem": ["careem"],
+    "Swiggy": ["swiggy"], "Zomato": ["zomato"], "McDonald's": ["mcdonalds", "mcdonald's"],
+    "KFC": ["kfc"], "Nike": ["nike"], "Adidas": ["adidas"], "Shein": ["shein"], "OnlyFans": ["onlyfans"],
+    "Tinder": ["tinder"], "Bumble": ["bumble"], "Grindr": ["grindr"], "Line": ["line"],
+    "WeChat": ["wechat"], "VK": ["vk", "vkontakte"], "Unknown": ["unknown"]
 }
 
-# Service Emojis (for display in Telegram messages)
+# Service Emojis
 SERVICE_EMOJIS = {
     "Telegram": "📩", "WhatsApp": "🟢", "Facebook": "📘", "Instagram": "📸", "Messenger": "💬",
     "Google": "🔍", "Gmail": "✉️", "YouTube": "▶️", "Twitter": "🐦", "X": "❌",
@@ -204,22 +137,16 @@ def save_chat_ids(chat_ids):
     with open(CHAT_IDS_FILE, 'w') as f:
         json.dump(chat_ids, f, indent=4)
 
-# --- New Telegram Command Handlers ---
+# --- Telegram Command Handlers ---
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     
-    keyboard = [
-        [INLINE_BUTTONS[0]],
-        [INLINE_BUTTONS[1]],
-        [INLINE_BUTTONS[2]],
-        [INLINE_BUTTONS[3]],
-    ]
+    keyboard = [[INLINE_BUTTONS[0]], [INLINE_BUTTONS[1]], [INLINE_BUTTONS[2]], [INLINE_BUTTONS[3]]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     if str(user_id) in ADMIN_CHAT_IDS:
         await update.message.reply_text(
-            "Welcome Admin!\n"
-            "You can use the following commands:\n"
+            "Welcome Admin!\nYou can use the following commands:\n"
             "/add_chat <chat_id> - Add a new chat ID\n"
             "/remove_chat <chat_id> - Remove a chat ID\n"
             "/list_chats - List all chat IDs",
@@ -300,8 +227,8 @@ def save_processed_id(sms_id):
 async def fetch_sms_from_api(client: httpx.AsyncClient, headers: dict, csrf_token: str):
     all_messages = []
     try:
-        today = datetime.utcnow() # Using UTC time
-        start_date = today - timedelta(days=1) # Data for the last 24 hours
+        today = datetime.utcnow()
+        start_date = today - timedelta(days=1)
         from_date_str, to_date_str = start_date.strftime('%m/%d/%Y'), today.strftime('%m/%d/%Y')
         first_payload = {'from': from_date_str, 'to': to_date_str, '_token': csrf_token}
         summary_response = await client.post(SMS_API_ENDPOINT, headers=headers, data=first_payload)
@@ -332,7 +259,7 @@ async def fetch_sms_from_api(client: httpx.AsyncClient, headers: dict, csrf_toke
                     sms_text_p = card.find('p', class_='mb-0')
                     if sms_text_p:
                         sms_text = sms_text_p.get_text(separator='\n').strip()
-                        date_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') # Using UTC time
+                        date_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
                         
                         country_name_match = re.match(r'([a-zA-Z\s]+)', group_id)
                         if country_name_match: country_name = country_name_match.group(1).strip()
@@ -349,7 +276,6 @@ async def fetch_sms_from_api(client: httpx.AsyncClient, headers: dict, csrf_toke
                         unique_id = f"{phone_number}-{sms_text}"
                         flag = COUNTRY_FLAGS.get(country_name, "🏴‍☠️")
                         
-                        # Using 'sms_text' instead of 'full_sms_text'
                         all_messages.append({"id": unique_id, "time": date_str, "number": phone_number, "country": country_name, "flag": flag, "service": service, "code": code, "full_sms": sms_text}) 
         return all_messages
     except httpx.RequestError as e:
@@ -367,37 +293,29 @@ async def send_telegram_message(context: ContextTypes.DEFAULT_TYPE, chat_id: str
         service_name, code_str = message_data.get("service", "N/A"), message_data.get("code", "N/A")
         full_sms_text = message_data.get("full_sms", "N/A")
         
-        # Add service emoji
-        service_emoji = SERVICE_EMOJIS.get(service_name, "❓") # If service not found, show '❓'
+        service_emoji = SERVICE_EMOJIS.get(service_name, "❓")
 
-        # Message format reverted to previous state with extra spacing
         full_message = (f"🔔 *You have successfully received OTP*\n\n" 
                         f"📞 *Number:* `{escape_markdown(number_str)}`\n" 
                         f"🔑 *Code:* `{escape_markdown(code_str)}`\n" 
                         f"🏆 *Service:* {service_emoji} {escape_markdown(service_name)}\n" 
                         f"🌎 *Country:* {escape_markdown(country_name)} {flag_emoji}\n" 
                         f"⏳ *Time:* `{escape_markdown(time_str)}`\n\n" 
-                        f"💬 *Message:*\n" 
-                        f"\`\`\`\n{full_sms_text}\n\`\`\`")
+                        f"💬 *Message:*\n"
+                        rf"\`\`\`\n{full_sms_text}\n\`\`\`")
         
-        keyboard = [
-            [INLINE_BUTTONS[0]],  # First button in its own row
-            [INLINE_BUTTONS[1]],  # Second button in its own row
-            [INLINE_BUTTONS[2]],  # Third button in its own row
-            [INLINE_BUTTONS[3]],  # Fourth button in its own row
-        ]
+        keyboard = [[INLINE_BUTTONS[0]], [INLINE_BUTTONS[1]], [INLINE_BUTTONS[2]], [INLINE_BUTTONS[3]]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='MarkdownV2', reply_markup=reply_markup)
     except Exception as e:
         print(f"❌ Error sending message to chat ID {chat_id}: {e}")
 
-# --- Main Job or Task ---
+# --- Main Job ---
 async def check_sms_job(context: ContextTypes.DEFAULT_TYPE):
-    print(f"\n--- [{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}] Checking for new messages ---") # Using UTC time
+    print(f"\n--- [{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}] Checking for new messages ---")
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     
-    # Instructing httpx client to follow redirects
     async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
         try:
             print("ℹ️ Attempting to log in...")
@@ -409,7 +327,6 @@ async def check_sms_job(context: ContextTypes.DEFAULT_TYPE):
 
             login_res = await client.post(LOGIN_URL, data=login_data, headers=headers)
             
-            # A 302 redirect can be a sign of successful login, so checking URL instead of raise_for_status()
             if "login" in str(login_res.url):
                 print("❌ Login failed. Check username/password.")
                 return
@@ -449,18 +366,14 @@ async def check_sms_job(context: ContextTypes.DEFAULT_TYPE):
             print(f"❌ A problem occurred in the main process: {e}")
             traceback.print_exc()
 
-# --- Main part to start the bot ---
+# --- Main Entry Point ---
 def main():
     print("🚀 iVasms to Telegram Bot is starting...")
 
-    # Not checking for 'YOUR_SECOND_ADMIN_ID_HERE' anymore,
-    # as you have correctly provided the IDs in ADMIN_CHAT_IDS.
-    # A warning will be shown if the ADMIN_CHAT_IDS list is empty.
     if not ADMIN_CHAT_IDS:
         print("\n!!! 🔴 WARNING: You have not correctly set admin IDs in your ADMIN_CHAT_IDS list. !!!\n")
         return
 
-    # Create the bot application
     application = Application.builder().token(YOUR_BOT_TOKEN).build()
 
     # Add command handlers
@@ -469,15 +382,21 @@ def main():
     application.add_handler(CommandHandler("remove_chat", remove_chat_command))
     application.add_handler(CommandHandler("list_chats", list_chats_command))
 
-    # Set the main job to run repeatedly at a specific interval
-    job_queue = application.job_queue
-    job_queue.run_repeating(check_sms_job, interval=POLLING_INTERVAL_SECONDS, first=1)
-
-    print(f"🚀 Checking for new messages every {POLLING_INTERVAL_SECONDS} seconds.")
+    try:
+        job_queue = application.job_queue
+        if job_queue is not None:
+            job_queue.run_repeating(check_sms_job, interval=POLLING_INTERVAL_SECONDS, first=1)
+            print(f"✅ SMS checking active: polling every {POLLING_INTERVAL_SECONDS} seconds.")
+        else:
+            print("❌ CRITICAL: JobQueue failed to initialize. Ensure 'python-telegram-bot[job-queue]' is installed.")
+            print("Install with: pip install 'python-telegram-bot[job-queue]'")
+    except Exception as e:
+        print(f"❌ Error setting up job queue: {e}")
+        traceback.print_exc()
+    
     print("🤖 Bot is now online. Ready to listen for commands.")
     print("⚠️ Press Ctrl+C to stop the bot.")
     
-    # Start the bot
     application.run_polling()
 
 if __name__ == "__main__":
